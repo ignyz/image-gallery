@@ -76,15 +76,15 @@ namespace PixProGallery
                 {
                     try
                     {
-
                         fi = new FileInfo(fileName);
                         FileInfo fileinfo = new FileInfo(fileName);
+
                         using (FileStream stream = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read))
                         {
                             personalImageListLocation.Add(fileName);
                             personalImageList.Images.Add(Image.FromStream(stream));
-                            //imageCount++;
                         }
+
                         listView1.LargeImageList = personalImageList;
 
                         listView1.Items.Add(new ListViewItem
@@ -98,9 +98,9 @@ namespace PixProGallery
                     }
                     catch (Exception)
                     {
-                        listView1.Dispose();
+                        //listView1.Dispose();
                     }
-                   
+
                 }
             }
         }
@@ -135,21 +135,32 @@ namespace PixProGallery
                                 ListViewItem itm = listView1.SelectedItems[i];
                                 removeAt = itm.Index;
 
-                                //personalImageListLocation.RemoveAt(removeAt);
-                                //personalImageList.Images.RemoveAt(removeAt);
-                                listView1.Items[itm.Index].Remove();
+                                personalImageListLocation.RemoveAt(removeAt);
+                                personalImageList.Images.RemoveAt(removeAt);
+                                //for (int j = listView1.Items.Count; j >= removeAt; j--)
+                                //{
+                                //    listView1.Items[j].ImageIndex -= 1;
+                                //}
+                                listView1.Items.RemoveAt(removeAt);
+                                //listView1.Items.Clear();
+
+                                listView1.LargeImageList = personalImageList;
+
                                 imageCount--;
-                              
+
                             }
                             catch (ArgumentException)
                             {
                             }
                         }
+
+                        //
+
                     }
 
                 }
                 pictureBox1.Image = null;
-                listView1.Refresh();
+                //listView1.Refresh();
             }
             else if (e.KeyCode == Keys.D && e.Control)
             {
@@ -180,15 +191,15 @@ namespace PixProGallery
         //rename
         private void listView1_AfterLabelEdit(object sender, System.Windows.Forms.LabelEditEventArgs e)
         {
-            if (e.Label == null)
-                return;
-            NewImageName = Convert.ToString(e.Label);
+            //if (e.Label == null)
+            //    return;
+            //NewImageName = Convert.ToString(e.Label);
 
-            ListViewItem item1 = listView1.SelectedItems[0];
+            //ListViewItem item1 = listView1.SelectedItems[0];
 
-            FileInfo fileInfo = new FileInfo(item1.Tag.ToString());
-            fileInfo.MoveTo(fileInfo.Directory.FullName + "\\" + NewImageName + fileInfo.Extension);
-            listView1.Items[imageCount].Text = NewImageName;
+            //FileInfo fileInfo = new FileInfo(item1.Tag.ToString());
+            //fileInfo.MoveTo(fileInfo.Directory.FullName + "\\" + NewImageName + fileInfo.Extension);
+            //listView1.Items[imageCount].Text = NewImageName;
 
         }
 
@@ -196,7 +207,6 @@ namespace PixProGallery
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-            listView1.Refresh();
 
             Bitmap bm;
             pictureBox1.InitialImage = null;
@@ -205,7 +215,8 @@ namespace PixProGallery
             {
 
                 pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-                int s = listView1.SelectedItems[0].ImageIndex;
+                int s = listView1.SelectedItems[0].Index;
+                listView1.Refresh();
 
                 using (FileStream stream = new FileStream(personalImageListLocation[s], FileMode.Open, FileAccess.Read))
                 using (BinaryReader reader = new BinaryReader(stream))
@@ -213,7 +224,6 @@ namespace PixProGallery
                     var memoryStream = new MemoryStream(reader.ReadBytes((int)stream.Length));
                     try
                     {
-
                         bm = new Bitmap(memoryStream);//listView1.Items[s].Text);
                         pictureBox1.Image = bm;
                     }
@@ -247,7 +257,7 @@ namespace PixProGallery
 
         private void renameToolStripMenuItem_Click(object sender, EventArgs e)
         {
-           
+
         }
 
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -278,10 +288,33 @@ namespace PixProGallery
                     {
                         try
                         {
+                            ///new 
                             ListViewItem itm = listView1.SelectedItems[i];
-                            //personalImageListLocation.RemoveAt(itm.Index);
-                            listView1.Items[itm.Index].Remove();
+                            int removeAt = itm.Index;
+
+                            personalImageListLocation.RemoveAt(removeAt);
+                            personalImageList.Images.RemoveAt(removeAt);
+                            //for (int j = listView1.Items.Count; j >= removeAt; j--)
+                            //{
+                            //    listView1.Items[j].ImageIndex -= 1;
+                            //}
+                            listView1.Items.RemoveAt(removeAt);
+                            //listView1.Items.Clear();
+
+                            listView1.LargeImageList = personalImageList;
+
                             imageCount--;
+
+
+
+
+
+                            /// vvv - old 
+                            //ListViewItem itm = listView1.SelectedItems[i];
+                            //personalImageListLocation.RemoveAt(itm.Index);
+                            //personalImageList.Images.RemoveAt(itm.Index);
+                            //listView1.Items.RemoveAt(itm.Index);
+                            //imageCount--;
                         }
                         catch (ArgumentException)
                         {
@@ -290,8 +323,8 @@ namespace PixProGallery
                 }
 
             }
-            pictureBox1.Image = null;
-            listView1.Refresh();
+            //pictureBox1.Image = null;
+            //listView1.Refresh();
         }
         // Save changes before exiting
         private void button1_Click_1(object sender, EventArgs e)
@@ -339,12 +372,12 @@ namespace PixProGallery
                         }
                         catch (Exception)
                         {
-                            listView1.Dispose();
+                            //listView1.Dispose();
                             listView1.Refresh();
                         }
                     }
 
-                   
+
                 }
             }
         }
