@@ -18,6 +18,7 @@ namespace PixProGallery.Properties
     {
 
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
+        internal object listView1;
 
         public static Settings Default
         {

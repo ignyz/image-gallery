@@ -18,7 +18,6 @@ namespace PixProGallery
 
         int imageCount = 0;
 
-        //List<string> personalImageListLocation = new List<string>();
         System.Windows.Forms.ImageList personalImageList = new ImageList();
 
         OpenFileDialog ofd = new OpenFileDialog()
@@ -36,30 +35,33 @@ namespace PixProGallery
         public Form2()
         {
             InitializeComponent();
-            listView1.SmallImageList = personalImageList;
+            listView1.LargeImageList = personalImageList;
             this.KeyPreview = true;
             listView1.MouseClick += new MouseEventHandler(listView1_MouseClick);
         }
 
-        // Tried to save collected data before exiting and seeing same results after
+        // save collected data before exiting and seeing same results after
+        private void Form1_Load(object sender, EventArgs e)
+        {
 
+        }
         //private void Form1_Load(object sender, EventArgs e)
         //{
         //    listView1.Clear();
-        //    foreach (string reviewKey in Model.ReviewData.Keys)
+        //    foreach (string reviewKey in personalImageList.Images.Keys)
         //    {
-        //        Review review = Model.ReviewData[reviewKey];
-        //        ListViewItem item = new ListViewItem(review.reviewerName);
-        //        item.SubItems.Add(review.review);
+        //        //    ImageList.ImageCollection review = personalImageList.Images[reviewKey];
+        //        ListViewItem item = new ListViewItem();
+        //        item.SubItems.Add(personalImageList.Images[personalImageList.Images.IndexOfKey(reviewKey)]).;
         //        listView1.Items.Add(item);
         //    }
         //}
 
-        //private void Form1_FormClosed(object sender, FormClosedEventArgs e)
-        //{
-        //    Properties.Settings.Default.listView1 = textBox1.Text;
-        //    Properties.Settings.Default.Save();
-        //}
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Properties.Settings.Default.listView1 = personalImageList;
+            Properties.Settings.Default.Save();
+        }
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -69,42 +71,42 @@ namespace PixProGallery
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-
                 foreach (string fileName in ofd.FileNames)
                 {
                     try
                     {
-                        fi = new FileInfo(fileName);
-                        FileInfo fileinfo = new FileInfo(fileName);
-
-                        //personalImageList = new ImageList();
-
-                        using (FileStream stream = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read))
-                        {
-                            //personalImageListLocation.Add(fileName);
-                            personalImageList.Images.Add(Image.FromStream(stream));
-                        }
-
-                        listView1.Items.Add(new ListViewItem
-                        {
-                            ImageIndex = imageCount,
-                            Text = fi.Name,
-                            Tag = fi.FullName
-                        });
-                        listView1.LargeImageList = personalImageList;
-                        //personalImageList = new ImageList();
-                        //personalImageList = listView1.LargeImageList;
-
-                        imageCount++;
+                        fi = ImageAdding(fileName);
                     }
                     catch (Exception)
                     {
-                        //listView1.Dispose();
                     }
 
                 }
             }
         }
+
+        private FileInfo ImageAdding(string fileName)
+        {
+            FileInfo fi = new FileInfo(fileName);
+            FileInfo fileinfo = new FileInfo(fileName);
+
+            using (FileStream stream = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read))
+            {
+                personalImageList.Images.Add(Image.FromStream(stream));
+            }
+
+            listView1.Items.Add(new ListViewItem
+            {
+                ImageIndex = imageCount,
+                Text = fi.Name,
+                Tag = fi.FullName
+            });
+            listView1.LargeImageList = personalImageList;
+
+            imageCount++;
+            return fi;
+        }
+
         //Select all images using (ctrl+A) or edit using F2 or delete using DELETE
         private void listView1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -123,7 +125,6 @@ namespace PixProGallery
             }
             else if (e.KeyData == Keys.Delete)
             {
-                //int removeAt = 0;
                 if (listView1.SelectedItems.Count > 0)
                 {
                     var confirmation = MessageBox.Show("Are you sure want to remove pictures from the list?", "Suppression", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
@@ -134,17 +135,12 @@ namespace PixProGallery
                             try
                             {
                                 RemovingImage(i);
-
                             }
                             catch (ArgumentException)
                             {
                             }
                         }
-
-                        //
-
                     }
-
                 }
                 pictureBox1.Image = null;
                 listView1.Refresh();
@@ -156,12 +152,11 @@ namespace PixProGallery
                     this.listView1.SelectedItems.Clear();
                     pictureBox1.Image = null;
                     listView1.Refresh();
-
                 }
                 catch (Exception) { }
             }
         }
-        // Remove with selected by mouse
+        // Remove files selected by mouse
         private void bToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -181,7 +176,6 @@ namespace PixProGallery
                         }
                     }
                 }
-
             }
             pictureBox1.Image = null;
             listView1.Refresh();
@@ -192,40 +186,20 @@ namespace PixProGallery
             int removeAt = itm.Index;
             Console.WriteLine(removeAt);
 
-            //foreach (var item in personalImageList)
-            //{
-            //    Console.WriteLine(item);
-            //}
-
-            //Console.WriteLine(listView1.Items[removeAt].Tag);
-            //Console.WriteLine(listView1.Items[removeAt].ImageKey);
-            //Console.WriteLine(personalImageList.Images[removeAt].Tag);
-            //personalImageListLocation.RemoveAt(removeAt);
-
+            // for removing original file.
             //My.Computer.FileSystem.DeleteFile(ListView1.SelectedItems(0).Tag.ToString, FileIO.UIOption.OnlyErrorDialogs, FileIO.RecycleOption.SendToRecycleBin)
 
-
-            //personalImageList.Images.RemoveByKey(listView1.Items[removeAt].ImageKey);
             personalImageList.Images.RemoveByKey(listView1.SelectedItems[i].ImageKey);
 
-            //listView1.Items.RemoveAt(removeAt);
             listView1.Items.Remove(listView1.SelectedItems[i]);
 
-            //personalImageList= new ImageList();
             personalImageList = listView1.LargeImageList;
 
-
-
-            //personalImageList.Images.RemoveAt(removeAt);
-            //for (int j = personalImageList.Images.Count; j > removeAt; j--)
-            //{
-            //    listView1.Items.-= 1;
-            //}
             for (int j = listView1.Items.Count; j >= removeAt; j--)
             {
                 listView1.Items[j].ImageIndex--;
             }
-            //listView1.Items.Clear();
+
             imageCount--;
         }
 
@@ -253,31 +227,27 @@ namespace PixProGallery
             ListViewItem item1 = listView1.SelectedItems[0];
 
             FileInfo fileInfo = new FileInfo(item1.Tag.ToString());
-            fileInfo.MoveTo(fileInfo.Directory.FullName + "\\" + NewImageName + fileInfo.Extension);
-            listView1.Items[imageCount].Text = NewImageName;
+            fileInfo.MoveTo(fileInfo.Directory.FullName + "\\" + NewImageName /*+ fileInfo.Extension*/);
+            listView1.Items[item1.Index].Text = NewImageName;
 
         }
 
         // Display selected image
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
-
-
             Bitmap bm;
             pictureBox1.InitialImage = null;
 
             if (listView1.SelectedItems.Count == 1)
             {
-
                 pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+
                 ListViewItem itm = listView1.SelectedItems[0];
                 int removeAt = itm.Index;
-                Console.WriteLine(removeAt);
+                //Console.WriteLine(removeAt);
 
                 string s = listView1.SelectedItems[0].Tag.ToString();
                 listView1.Refresh();
-
-
 
                 using (FileStream stream = new FileStream(s, FileMode.Open, FileAccess.Read))
                 using (BinaryReader reader = new BinaryReader(stream))
@@ -285,19 +255,15 @@ namespace PixProGallery
                     var memoryStream = new MemoryStream(reader.ReadBytes((int)stream.Length));
                     try
                     {
-                        bm = new Bitmap(memoryStream);//listView1.Items[s].Text);
+                        bm = new Bitmap(memoryStream);
                         pictureBox1.Image = bm;
                     }
                     catch (Exception)
                     {
                         pictureBox1.Dispose();
                     }
-
                 }
-
-
             }
-
         }
 
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
@@ -305,37 +271,17 @@ namespace PixProGallery
 
         }
 
-        private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
-        {
-
-        }
-
-        // Rename
         private void contextMenuStrip1_Opening_1(object sender, CancelEventArgs e)
         {
 
         }
 
-        private void renameToolStripMenuItem_Click(object sender, EventArgs e)
-        {
 
-        }
-
-        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
 
         }
-
 
         // Searcing [recursevly] folder
         private void button1_Click_1(object sender, EventArgs e)
@@ -346,8 +292,7 @@ namespace PixProGallery
 
                 if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                 {
-                    //String searchFolder = @"C:\Users\Ignas\OneDrive - Kaunas University of Technology\PixPro\Images";
-                    String searchFolder = @"" + fbd.SelectedPath;//@"C:\Users\Ignas\Pictures";
+                    String searchFolder = @"" + fbd.SelectedPath;
                     var filters = new String[] { "jpg", "jpeg", "png", "gif", "tiff", "bmp" };
                     var files = GetFilesFrom(searchFolder, filters, checkBox1.Checked);
 
@@ -355,35 +300,14 @@ namespace PixProGallery
                     personalImageList.ColorDepth = ColorDepth.Depth16Bit;
                     FileInfo fi;
 
-
-
                     foreach (string fileName in files)
                     {
                         try
                         {
-
-                            fi = new FileInfo(fileName);
-                            FileInfo fileinfo = new FileInfo(fileName);
-                            using (FileStream stream = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read))
-                            {
-                                //personalImageListLocation.Add(fileName);
-                                personalImageList.Images.Add(Image.FromStream(stream));
-                                //imageCount++;
-                            }
-
-                            listView1.Items.Add(new ListViewItem
-                            {
-                                ImageIndex = imageCount,
-                                Text = fi.Name,
-                                Tag = fi.FullName
-                            });
-                            listView1.LargeImageList = personalImageList;
-
-                            imageCount++;
+                            fi = ImageAdding(fileName);
                         }
                         catch (Exception)
                         {
-                            //listView1.Dispose();
                             listView1.Refresh();
                         }
                     }
