@@ -79,6 +79,7 @@ namespace PixProGallery
                     }
                     catch (Exception)
                     {
+
                     }
 
                 }
@@ -88,22 +89,44 @@ namespace PixProGallery
         private FileInfo ImageAdding(string fileName)
         {
             FileInfo fi = new FileInfo(fileName);
-            FileInfo fileinfo = new FileInfo(fileName);
+            //FileInfo fileinfo = new FileInfo(fileName);
+            Console.WriteLine(fi.Name);
 
-            using (FileStream stream = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read))
-            {
-                personalImageList.Images.Add(Image.FromStream(stream));
-            }
-
-            listView1.Items.Add(new ListViewItem
+            ListViewItem lvi = new ListViewItem
             {
                 ImageIndex = imageCount,
                 Text = fi.Name,
                 Tag = fi.FullName
-            });
-            listView1.LargeImageList = personalImageList;
 
-            imageCount++;
+            };
+
+            bool found = false;
+            foreach (ListViewItem item in listView1.Items)
+            {
+                if (item.Tag == lvi.Tag)
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+                if (!found)
+            {
+                using (FileStream stream = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read))
+                {
+                    personalImageList.Images.Add(Image.FromStream(stream));
+                }
+
+                listView1.Items.Add(lvi);
+                listView1.LargeImageList = personalImageList;
+
+                imageCount++;
+            }
+            else
+            {
+                MessageBox.Show("There is already the same image with the same name, the image won't appear again", "Suppression", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            }
             return fi;
         }
 
@@ -180,8 +203,12 @@ namespace PixProGallery
             pictureBox1.Image = null;
             listView1.Refresh();
         }
+
+
+
         private void RemovingImage(int i)
         {
+
             ListViewItem itm = listView1.SelectedItems[i];
             int removeAt = itm.Index;
             Console.WriteLine(removeAt);
@@ -227,8 +254,10 @@ namespace PixProGallery
             ListViewItem item1 = listView1.SelectedItems[0];
 
             FileInfo fileInfo = new FileInfo(item1.Tag.ToString());
-            fileInfo.MoveTo(fileInfo.Directory.FullName + "\\" + NewImageName /*+ fileInfo.Extension*/);
+            fileInfo.MoveTo(fileInfo.Directory.FullName + "\\" + NewImageName);
             listView1.Items[item1.Index].Text = NewImageName;
+            listView1.Items[item1.Index].Tag = fileInfo.Directory.FullName + "\\" + NewImageName;
+
 
         }
 
