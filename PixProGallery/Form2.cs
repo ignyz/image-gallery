@@ -89,7 +89,9 @@ namespace PixProGallery
         private FileInfo ImageAdding(string fileName)
         {
             FileInfo fi = new FileInfo(fileName);
+            
             //FileInfo fileinfo = new FileInfo(fileName);
+
             Console.WriteLine(fi.Name);
 
             ListViewItem lvi = new ListViewItem
@@ -97,20 +99,20 @@ namespace PixProGallery
                 ImageIndex = imageCount,
                 Text = fi.Name,
                 Tag = fi.FullName
-
             };
 
             bool found = false;
+
             foreach (ListViewItem item in listView1.Items)
             {
-                if (item.Tag == lvi.Tag)
+                if (item.Tag.Equals(lvi.Tag))
                 {
                     found = true;
                     break;
                 }
             }
 
-                if (!found)
+            if (!found)
             {
                 using (FileStream stream = new FileStream(fi.FullName, FileMode.Open, FileAccess.Read))
                 {
@@ -124,8 +126,7 @@ namespace PixProGallery
             }
             else
             {
-                MessageBox.Show("There is already the same image with the same name, the image won't appear again", "Suppression", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
+                MessageBox.Show("There is already the same image " + fi.Name + " with the same name, the image won't appear again", "Suppression", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             return fi;
         }
@@ -249,18 +250,28 @@ namespace PixProGallery
         {
             if (e.Label == null)
                 return;
+
             NewImageName = Convert.ToString(e.Label);
 
             ListViewItem item1 = listView1.SelectedItems[0];
-
             FileInfo fileInfo = new FileInfo(item1.Tag.ToString());
-            fileInfo.MoveTo(fileInfo.Directory.FullName + "\\" + NewImageName);
-            listView1.Items[item1.Index].Text = NewImageName;
-            listView1.Items[item1.Index].Tag = fileInfo.Directory.FullName + "\\" + NewImageName;
 
+            Console.WriteLine(fileInfo.Directory.FullName + "\\" + NewImageName);
+            
+            if (Directory.GetFiles(fileInfo.Directory.FullName, NewImageName).Length == 0)
+            {
+                fileInfo.MoveTo(fileInfo.Directory.FullName + "\\" + NewImageName);
+                listView1.Items[item1.Index].Text = NewImageName;
+                listView1.Items[item1.Index].Tag = fileInfo.Directory.FullName + "\\" + NewImageName;
+            }
+            else
+            {
+                listView1.SelectedItems[0].Text = item1.Text.ToString();
+                MessageBox.Show("There is already a file with this name", "Suppression", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            listView1.Refresh();
 
         }
-
         // Display selected image
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
