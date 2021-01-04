@@ -65,8 +65,7 @@ namespace PixProGallery
 
         private void button1_Click(object sender, EventArgs e)
         {
-            personalImageList.ImageSize = new Size(40, 40);
-            personalImageList.ColorDepth = ColorDepth.Depth16Bit;
+           
             FileInfo fi;
 
             if (ofd.ShowDialog() == DialogResult.OK)
@@ -88,6 +87,8 @@ namespace PixProGallery
 
         private FileInfo ImageAdding(string fileName)
         {
+            personalImageList.ImageSize = new Size(40, 40);
+            personalImageList.ColorDepth = ColorDepth.Depth16Bit;
             FileInfo fi = new FileInfo(fileName);
             
             //FileInfo fileinfo = new FileInfo(fileName);
@@ -266,7 +267,8 @@ namespace PixProGallery
             }
             else
             {
-                listView1.SelectedItems[0].Text = item1.Text.ToString();
+                //listView1.SelectedItems[0].Text = item1.Text.ToString();
+                e.CancelEdit = true;
                 MessageBox.Show("There is already a file with this name", "Suppression", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             listView1.Refresh();
@@ -336,8 +338,8 @@ namespace PixProGallery
                     var filters = new String[] { "jpg", "jpeg", "png", "gif", "tiff", "bmp" };
                     var files = GetFilesFrom(searchFolder, filters, checkBox1.Checked);
 
-                    personalImageList.ImageSize = new Size(40, 40);
-                    personalImageList.ColorDepth = ColorDepth.Depth16Bit;
+                    //personalImageList.ImageSize = new Size(40, 40);
+                    //personalImageList.ColorDepth = ColorDepth.Depth16Bit;
                     FileInfo fi;
 
                     foreach (string fileName in files)
